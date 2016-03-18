@@ -1,0 +1,194 @@
+<style>
+
+  @keyframes move7 { /* animation */
+    from { transform: translate(0px, -3570px) }
+    to   { transform: translate(0px, 0px) }
+  }
+  /* animations which pick maps */
+  @keyframes pick71 {
+    from { transform: translate(0px, -3570px) }
+    to   { transform: translate(0px, -3060px) }
+  }
+  @keyframes pick72 {
+    from { transform: translate(0px, -3570px) }
+    to   { transform: translate(0px, -2550px) }
+  }
+  @keyframes pick73 {
+    from { transform: translate(0px, -3570px) }
+    to   { transform: translate(0px, -2040px) }
+  }
+  @keyframes pick74 {
+    from { transform: translate(0px, -3570px) }
+    to   { transform: translate(0px, -1530px) }
+  }
+  @keyframes pick75 {
+    from { transform: translate(0px, -3570px) }
+    to   { transform: translate(0px, -1020px) }
+  }
+  @keyframes pick76 {
+    from { transform: translate(0px, -3570px) }
+    to   { transform: translate(0px, -510px) }
+  }
+  @keyframes pick77 {
+    from { transform: translate(0px, -3570px) }
+    to   { transform: translate(0px, 0px) }
+  }
+  .move7f {
+    animation: move7 1s steps(1000) infinite;
+  }
+  .move7m {
+    animation: move7 1.55s steps(1000) infinite;
+  }
+  .move7s {
+    animation: move7 2.55s steps(1000) infinite;
+  }
+  .move7z {
+    animation: move7 3.55s steps(1000) infinite;
+  }
+  .pick71z {
+    animation: pick71 1s steps(1000) ;
+  }
+  .pick72z {
+    animation: pick72 2s steps(1000) ;
+  }
+  .pick73z {
+    animation: pick73 2.25s steps(1000) ;
+  }
+  .pick74z {
+    animation: pick74 3.50s steps(1000) ;
+  }
+  .pick75z {
+    animation: pick75 4s steps(1000) ;
+  }
+  .pick76z {
+    animation: pick76 5.50s steps(1000) ;
+  }
+  .pick77z {
+    animation: pick77 6s steps(1000) ;
+  }
+
+  * {
+    background: black;
+  }
+</style>
+
+<div id="reelContainer">
+</div>
+
+<script>
+  function preload(is, f) {
+    var loaded = 0
+    function preloadOne(i) {
+      i.img = new Image()
+      i.img.addEventListener('load', function() { bumpLoaded() }, false)
+      i.img.addEventListener('error', function(err) { bumpLoaded(err, i.id) })
+      i.img.src = 'img/400px-' + i.id + '.jpg'
+    }
+    function bumpLoaded(err, id) {
+      if (err) {
+        return console.error('Failed to load ' + id, err)
+      }
+      loaded++
+      if (is.length === loaded) {
+        return f(is)
+      }
+    }
+    return is.map(function(i) {
+      return preloadOne(i)
+    })
+  }
+
+  function copyArray(xs) {
+    var copy = [];
+    for( var i = 0 ; i < xs.length; i++) {
+      copy.push(xs[i]);
+    }
+    return copy;
+  }
+
+  function shuffleArray( array ) {
+    for (i = array.length - 1; i > 0; i--) {
+      var j = parseInt(Math.random() * i)
+      var tmp = array[i];
+      array[i] = array[j]
+      array[j] = tmp;
+    }
+  }
+
+  function ladderMaps() {
+    return [ { id:   'Dusk_Towers'
+             , name: 'Dusk Towers' }
+           , { id:   'Orbital_Shipyard'
+             , name: 'Orbital Shipyard' }
+           , { id:   'Prion_Terraces'
+             , name: 'Prion Terraces' }
+           , { id:   'Ulrena'
+             , name: 'Ulrena' }
+           , { id:   'Central_Protocol'
+             , name: 'Central Protocol' }
+           , { id:   'Lerilak_Crest'
+             , name: 'Lerilak Crest' }
+           , { id:   'Ruins_of_Seras'
+             , name: 'Ruins of Seras' } ]
+  }
+
+  var moveF = 3000
+  var moveS = 1000
+    
+  function selectNthFromK(n, k, reel) {
+    reel.className = 'move' + k + 'f'
+    window.setTimeout(function() {
+      reel.className = 'move' + k + 'm'
+      window.setTimeout(function() {
+        reel.className = 'move' + k + 's'
+        window.setTimeout(function() {
+          reel.className = 'move' + k + 'z'
+          window.setTimeout(function() {
+            reel.className = 'pick' + k + '' + n
+          }, moveS)
+        }, moveS)
+      }, moveS)
+    }, moveF)
+  }
+
+  preload(ladderMaps(), function(ms) {
+    var leftMargin  = 5
+    var topMargin   = 5
+    var verticalOne = 500 + (2 * topMargin)
+
+    var perceivedHeight = ms.length * verticalOne
+    var realHeight      = perceivedHeight + (2 * verticalOne)
+
+    function printStuff(canvas, is) {
+      ctx = canvas.getContext('2d')
+      ctx.fillStyle = '#000000'
+      ctx.fillRect(0, 0, 10000, 10000)
+      // todo: corner-cases
+      ctx.save()
+      ctx.drawImage(is[0].img, leftMargin, perceivedHeight + (8 * topMargin))
+      ctx.drawImage(is[(is.length - 1)].img, leftMargin, (2 * topMargin))
+      ctx.restore()
+      for (var k in is) {
+        var r = k + 1
+        let i = is[k].img
+        ctx.save()
+        var v = 0
+        var v = (k * verticalOne) + ((verticalOne - i.height) / 2)
+        console.log(v)
+        ctx.drawImage(i, leftMargin, v)
+        ctx.restore()
+      }
+    }
+    var reelContainer = document.getElementById('reelContainer')
+    var reel = document.createElement('canvas')
+    reel.id = 'reel'
+    reel.width  = 410
+    reel.height = (ms.length + 2) * verticalOne
+    console.log("single box in px", verticalOne, "starting position", -perceivedHeight, "ending position", 0)
+    console.log("real height", realHeight, "perceived height", perceivedHeight)
+    reelContainer.appendChild(reel)
+    selectNthFromK(4, 7, reel)
+    return printStuff(reel, ms)
+  })
+
+</script>
